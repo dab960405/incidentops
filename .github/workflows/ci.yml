@@ -32,10 +32,19 @@ jobs:
       - name: Build and run tests
         run: ./mvnw -B --no-transfer-progress clean verify
 
-      - name: Upload executable JAR
+      - name: Generate and verify SHA-256 checksum
+        working-directory: target
+        run: |
+          sha256sum incidentops-*.jar > SHA256SUMS
+          cat SHA256SUMS
+          sha256sum -c SHA256SUMS
+
+      - name: Upload deployment artifacts
         uses: actions/upload-artifact@v4
         with:
           name: incidentops-jar
-          path: target/incidentops-*.jar
+          path: |
+            target/incidentops-*.jar
+            target/SHA256SUMS
           if-no-files-found: error
           retention-days: 7
